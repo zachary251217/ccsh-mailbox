@@ -175,11 +175,16 @@ export default function LetterForm({ turnstileSiteKey }: { turnstileSiteKey?: st
           id="content"
           name="content"
           className="textarea"
-          placeholder={"想對學生會說的話都可以寫在這裡。\n請不要在內容中留下自己的姓名、班級或學號。"}
+          placeholder={"想對學生會說的話都可以寫在這裡。\n請不要在內容中留下自己的姓名、班級或學號。\n匿名不代表免責，請為自己說的話負責。"}
           value={content}
           onChange={(e) => setContent(e.target.value)}
         />
-        <div className={`counter${over ? " over" : ""}`}>{content.length} / {LIMITS.contentMax}</div>
+        <div className="field-foot">
+          <p className="disclaimer">
+            ⚠ 匿名不代表免責。請勿發表不實指控、人身攻擊、歧視、恐嚇或洩漏他人隱私的內容；若內容涉及違法（如公然侮辱、誹謗），須自負法律責任。
+          </p>
+          <div className={`counter${over ? " over" : ""}`}>{content.length} / {LIMITS.contentMax}</div>
+        </div>
       </div>
 
       <div className="field">

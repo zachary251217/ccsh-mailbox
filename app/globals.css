@@ -334,3 +334,11 @@ a { color: var(--navy); }
 .clamp { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
 .link-btn { background: none; border: 0; padding: 0; color: var(--navy); cursor: pointer; font-size: 14px; margin-top: 4px; }
 @media (prefers-color-scheme: dark) { .link-btn { color: #b3a9f0; } }
+
+.field-foot { display: flex; align-items: flex-start; gap: 12px; margin-top: 6px; }
+.field-foot .counter { margin-top: 0; flex: none; }
+.disclaimer {
+  flex: 1; margin: 0; font-size: 13px; line-height: 1.6;
+  color: var(--warn); background: var(--warn-soft);
+  border-radius: 8px; padding: 6px 10px;
+}

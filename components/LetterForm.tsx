@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Script from "next/script";
 import { ALLOWED_TYPES, CATEGORIES, LIMITS } from "@/lib/config";
+import { checkContent } from "@/lib/moderation";
 
 type Picked = { file: File; preview: string | null };
 
@@ -36,6 +37,7 @@ export default function LetterForm({ turnstileSiteKey }: { turnstileSiteKey?: st
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [files, setFiles] = useState<Picked[]>([]);
+  const [allowPublic, setAllowPublic] = useState(true);
   const [drag, setDrag] = useState(false);
   const [error, setError] = useState("");
   const [sending, setSending] = useState(false);
@@ -80,6 +82,9 @@ export default function LetterForm({ turnstileSiteKey }: { turnstileSiteKey?: st
     if (!category) return setError("請選擇一個分類。");
     if (content.trim().length < LIMITS.contentMin) return setError(`內容至少要 ${LIMITS.contentMin} 個字。`);
 
+    const moderation = checkContent(title, content);
+    if (!moderation.ok) return setError(moderation.message);
+
     const fd = new FormData(e.currentTarget);
     fd.set("category", category);
     fd.delete("files");
@@ -105,6 +110,7 @@ export default function LetterForm({ turnstileSiteKey }: { turnstileSiteKey?: st
     setTitle("");
     setContent("");
     setFiles([]);
+    setAllowPublic(true);
     setSent(false);
     window.turnstile?.reset();
   }
@@ -120,7 +126,7 @@ export default function LetterForm({ turnstileSiteKey }: { turnstileSiteKey?: st
           <path d="M64.5 64l4 4 7-8" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
         <h2>信已經送出了！</h2>
-        <p>謝謝你的意見，學生會會認真閱讀每一封信。</p>
+        <p>謝謝你的意見，學生會會認真閱讀每一封信。{allowPublic && "回覆後會公布在下方的公告區。"}</p>
         <button type="button" className="btn btn-ghost" onClick={reset}>再寫一封</button>
       </div>
     );
@@ -207,6 +213,16 @@ export default function LetterForm({ turnstileSiteKey }: { turnstileSiteKey?: st
             ))}
           </div>
         )}
+      </div>
+
+      <div className="field">
+        <label className="check consent">
+          <input type="checkbox" name="allow_public" checked={allowPublic} onChange={(e) => setAllowPublic(e.target.checked)} />
+          <span>
+            同意學生會將這封信公開到公告區
+            <small>只會公開分類、標題與內容，不含附件。學生會審核後才會公開。</small>
+          </span>
+        </label>
       </div>
 
       {turnstileSiteKey && (

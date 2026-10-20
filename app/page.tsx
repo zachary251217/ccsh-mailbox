@@ -1,8 +1,13 @@
 import LetterForm from "@/components/LetterForm";
 import { HeroDecor, Postmark } from "@/components/Decor";
+import Announcements from "@/components/Announcements";
 import { SITE_TITLE } from "@/lib/config";
+import { store } from "@/lib/store";
 
-export default function Home() {
+export const dynamic = "force-dynamic";
+
+export default async function Home() {
+  const announcements = await store.listPublic();
   return (
     <>
       <header className="hero">
@@ -17,6 +22,7 @@ export default function Home() {
           </div>
           <h1>{SITE_TITLE}</h1>
           <p>對學校、活動或學生會有任何想法，都可以寫下來告訴我們。</p>
+          <a className="hero-link" href="#announcements">查看公告與回覆 ↓</a>
         </div>
       </header>
 
@@ -46,6 +52,8 @@ export default function Home() {
             <span><strong>附件去識別化</strong>自動移除照片位置、拍攝資訊與檔名</span>
           </li>
         </ul>
+
+        <Announcements items={announcements} />
       </main>
 
       <footer className="footer">

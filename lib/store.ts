@@ -2,7 +2,11 @@ import { promises as fs } from "fs";
 import path from "path";
 import { randomUUID } from "crypto";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
-import type { Status } from "./config";
+import { AUTO_PUBLISH, Status } from "./config";
+
+const PUBLIC_FIELDS = ["id", "created_at", "category", "title", "content", "reply", "replied_at"] as const;
+const toPublic = (l: Letter): PublicLetter =>
+  Object.fromEntries(PUBLIC_FIELDS.map((k) => [k, l[k]])) as PublicLetter;
 
 export type Attachment = { name: string; path: string; type: string; size: number };
 export type Letter = {
@@ -13,14 +17,25 @@ export type Letter = {
   content: string;
   status: Status;
   attachments: Attachment[];
+  /** 投信者是否同意公開到公告區 */
+  allow_public: boolean;
+  /** 學生會是否已公開到公告區 */
+  is_public: boolean;
+  reply: string | null;
+  replied_at: string | null;
 };
+export type LetterPatch = Partial<Pick<Letter, "status" | "is_public" | "reply" | "replied_at">>;
+export type PublicLetter = Pick<Letter, "id" | "created_at" | "category" | "title" | "content" | "reply" | "replied_at">;
+type CreateInput = { category: string; title: string | null; content: string; allow_public: boolean; files: UploadFile[] };
 export type UploadFile = { name: string; type: string; data: Buffer };
 
 interface Store {
-  create(input: { category: string; title: string | null; content: string; files: UploadFile[] }): Promise<Letter>;
+  create(input: CreateInput): Promise<Letter>;
   list(): Promise<Letter[]>;
+  /** 公告區：只回傳已公開信件的必要欄位（不含附件） */
+  listPublic(): Promise<PublicLetter[]>;
   get(id: string): Promise<Letter | null>;
-  setStatus(id: string, status: Status): Promise<void>;
+  update(id: string, patch: LetterPatch): Promise<void>;
   readFile(att: Attachment): Promise<Buffer>;
 }
 
@@ -29,7 +44,7 @@ const BUCKET = "attachments";
 
 function supabaseStore(sb: SupabaseClient): Store {
   return {
-    async create({ category, title, content, files }) {
+    async create({ category, title, content, allow_public, files }) {
       const id = randomUUID();
       const attachments: Attachment[] = [];
       for (const [i, f] of files.entries()) {
@@ -40,7 +55,7 @@ function supabaseStore(sb: SupabaseClient): Store {
       }
       const { data, error } = await sb
         .from("letters")
-        .insert({ id, category, title, content, attachments })
+        .insert({ id, category, title, content, attachments, allow_public, is_public: AUTO_PUBLISH && allow_public })
         .select()
         .single();
       if (error) throw error;
@@ -51,12 +66,21 @@ function supabaseStore(sb: SupabaseClient): Store {
       if (error) throw error;
       return data as Letter[];
     },
+    async listPublic() {
+      const { data, error } = await sb
+        .from("letters")
+        .select(PUBLIC_FIELDS.join(","))
+        .eq("is_public", true)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data as unknown as PublicLetter[];
+    },
     async get(id) {
       const { data } = await sb.from("letters").select("*").eq("id", id).maybeSingle();
       return (data as Letter) ?? null;
     },
-    async setStatus(id, status) {
-      const { error } = await sb.from("letters").update({ status }).eq("id", id);
+    async update(id, patch) {
+      const { error } = await sb.from("letters").update(patch).eq("id", id);
       if (error) throw error;
     },
     async readFile(att) {
@@ -84,7 +108,7 @@ async function writeAll(letters: Letter[]) {
 }
 
 const localStore: Store = {
-  async create({ category, title, content, files }) {
+  async create({ category, title, content, allow_public, files }) {
     const id = randomUUID();
     const attachments: Attachment[] = [];
     for (const [i, f] of files.entries()) {
@@ -102,6 +126,10 @@ const localStore: Store = {
       content,
       status: "new",
       attachments,
+      allow_public,
+      is_public: AUTO_PUBLISH && allow_public,
+      reply: null,
+      replied_at: null,
     };
     await writeAll([letter, ...(await readAll())]);
     return letter;
@@ -109,13 +137,16 @@ const localStore: Store = {
   async list() {
     return readAll();
   },
+  async listPublic() {
+    return (await readAll()).filter((l) => l.is_public).map(toPublic);
+  },
   async get(id) {
     return (await readAll()).find((l) => l.id === id) ?? null;
   },
-  async setStatus(id, status) {
+  async update(id, patch) {
     const all = await readAll();
     const l = all.find((x) => x.id === id);
-    if (l) l.status = status;
+    if (l) Object.assign(l, patch);
     await writeAll(all);
   },
   async readFile(att) {

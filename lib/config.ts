@@ -8,6 +8,15 @@ export const CATEGORIES = [
   "其他",
 ] as const;
 
+/**
+ * 公告區顯示方式：
+ * false（預設）＝學生會在後台按「公開」或回覆後，才會出現在公告
+ * true＝投信者同意公開的信件，送出後立即出現在公告（後台仍可隱藏）
+ */
+export const AUTO_PUBLISH = false;
+
+export const LIMITS_REPLY_MAX = 3000;
+
 export const STATUSES = {
   new: "未讀",
   processing: "處理中",

@@ -1,7 +1,7 @@
 import { auth, devBypass, isAdmin, signIn, signOut } from "@/auth";
 import { CATEGORIES, SITE_TITLE, STATUSES, Status } from "@/lib/config";
 import { store } from "@/lib/store";
-import StatusSelect from "@/components/StatusSelect";
+import LetterActions from "@/components/LetterActions";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: `後台｜${SITE_TITLE}` };
@@ -104,6 +104,8 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
             <article key={l.id} className={`card letter${l.status === "new" ? " is-new" : ""}`}>
               <div className="letter-head">
                 <span className="tag">{l.category}</span>
+                {l.is_public && <span className="tag tag-public">公告中</span>}
+                {l.reply && <span className="tag tag-replied">已回覆</span>}
                 <span className="time">{fmt(l.created_at)}</span>
               </div>
               {l.title && <h3>{l.title}</h3>}
@@ -120,9 +122,13 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                   })}
                 </div>
               )}
-              <div className="letter-foot">
-                <StatusSelect id={l.id} value={l.status} />
-              </div>
+              <LetterActions
+                id={l.id}
+                status={l.status}
+                allowPublic={Boolean(l.allow_public)}
+                isPublic={Boolean(l.is_public)}
+                reply={l.reply ?? null}
+              />
             </article>
           ))
         )}

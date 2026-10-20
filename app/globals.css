@@ -269,3 +269,68 @@ a { color: var(--navy); }
 .login { max-width: 400px; margin: 12vh auto 0; padding: 36px 28px; text-align: center; }
 .login h1 { font-size: 22px; margin: 0 0 6px; }
 .login p { color: var(--muted); margin: 0 0 24px; font-size: 15px; }
+
+/* ---------- 後台：回覆與公開 ---------- */
+.btn-sm { padding: 6px 14px; font-size: 14px; border-radius: 8px; }
+.btn-public-on { background: var(--ok-soft); color: var(--ok); border: 1px solid color-mix(in srgb, var(--ok) 35%, transparent); }
+.inline-field { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+.muted-note { font-size: 13px; color: var(--muted); }
+.tag-public { background: var(--ok-soft); color: var(--ok); }
+.tag-replied { background: var(--accent-soft); color: var(--accent); }
+.reply-box, .reply-editor { margin-top: 14px; }
+.reply-box {
+  background: color-mix(in srgb, var(--navy) 6%, var(--paper));
+  border-left: 3px solid var(--navy); border-radius: 0 10px 10px 0; padding: 10px 14px;
+}
+.reply-label { font-size: 12px; font-weight: 700; color: var(--navy); margin-bottom: 2px; letter-spacing: .05em; }
+@media (prefers-color-scheme: dark) { .reply-label { color: #b3a9f0; } }
+.reply-editor-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 8px; }
+.check { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; cursor: pointer; }
+.check input { width: 16px; height: 16px; accent-color: var(--navy); }
+
+/* ---------- 首頁：同意公開 ---------- */
+.consent { align-items: flex-start; font-size: 15px; }
+.consent input { margin-top: 5px; flex: none; }
+.consent small { display: block; color: var(--muted); font-size: 13px; }
+
+.hero-link {
+  display: inline-block; margin-top: 14px; color: #fff; font-size: 14px;
+  text-decoration: none; border-bottom: 1px dashed rgba(255, 255, 255, .5); padding-bottom: 1px;
+}
+.hero-link:hover { border-bottom-style: solid; }
+
+/* ---------- 首頁：公告 ---------- */
+.ann-section { margin-top: 48px; scroll-margin-top: 16px; }
+.section-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+.section-head h2 {
+  margin: 0; font-size: 24px; letter-spacing: .08em;
+  display: flex; align-items: center; gap: 10px;
+}
+.section-head h2::before {
+  content: ""; width: 6px; height: 22px; border-radius: 3px;
+  background: linear-gradient(var(--accent) 0 50%, var(--navy) 50% 100%);
+}
+.section-head p { margin: 0; color: var(--muted); font-size: 14px; }
+.ann-filter { margin-bottom: 14px; }
+.chip-sm { padding: 4px 12px; font-size: 14px; }
+.chip[aria-pressed="true"] { background: var(--navy); border-color: var(--navy); color: #fff; }
+
+.ann { padding: 18px 20px; margin-bottom: 12px; }
+.ann-q, .ann-a { display: flex; gap: 12px; align-items: flex-start; }
+.ann-a { margin-top: 14px; padding-top: 14px; border-top: 1px dashed var(--line); }
+.ann-mark {
+  flex: none; width: 28px; height: 28px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 14px; color: #fff;
+}
+.ann-mark.q { background: var(--accent); }
+.ann-mark.a { background: var(--navy); }
+.ann-text { flex: 1; min-width: 0; }
+.ann-text h3 { margin: 0 0 4px; font-size: 16px; }
+.ann-a-head { font-size: 13px; font-weight: 700; color: var(--navy); display: flex; gap: 8px; align-items: baseline; }
+@media (prefers-color-scheme: dark) { .ann-a-head { color: #b3a9f0; } }
+.ann-a-head .time { margin-left: 0; font-weight: 400; }
+.ann-pending { margin-top: 12px; font-size: 13px; color: var(--muted); padding-left: 40px; }
+.clamp { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+.link-btn { background: none; border: 0; padding: 0; color: var(--navy); cursor: pointer; font-size: 14px; margin-top: 4px; }
+@media (prefers-color-scheme: dark) { .link-btn { color: #b3a9f0; } }

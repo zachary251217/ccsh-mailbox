@@ -4,6 +4,7 @@ import { rateLimited } from "@/lib/rateLimit";
 import { sanitizeFile } from "@/lib/sanitize";
 import { store, UploadFile } from "@/lib/store";
 import { notifyNewLetter } from "@/lib/mail";
+import { checkContent } from "@/lib/moderation";
 
 export const runtime = "nodejs";
 
@@ -47,6 +48,10 @@ export async function POST(req: NextRequest) {
   if (content.length < LIMITS.contentMin) return fail(`內容至少要 ${LIMITS.contentMin} 個字。`);
   if (content.length > LIMITS.contentMax) return fail(`內容最多 ${LIMITS.contentMax} 字。`);
 
+  const moderation = checkContent(title, content);
+  if (!moderation.ok) return fail(moderation.message);
+  const allowPublic = form.get("allow_public") === "on";
+
   const rawFiles = form.getAll("files").filter((f): f is File => f instanceof File && f.size > 0);
   if (rawFiles.length > LIMITS.maxFiles) return fail(`最多上傳 ${LIMITS.maxFiles} 個檔案。`);
 
@@ -62,7 +67,7 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  const letter = await store.create({ category, title: title || null, content, files });
+  const letter = await store.create({ category, title: title || null, content, allow_public: allowPublic, files });
 
   try {
     await notifyNewLetter(letter);

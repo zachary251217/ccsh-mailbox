@@ -7,7 +7,11 @@ import { store } from "@/lib/store";
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const announcements = await store.listPublic();
+  // 資料庫暫時連不上時，投信表單仍要能顯示
+  const announcements = await store.listPublic().catch((e) => {
+    console.error("讀取公告失敗", e);
+    return [];
+  });
   return (
     <>
       <header className="hero">

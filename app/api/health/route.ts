@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { isAdmin } from "@/auth";
 import { store, usingSupabase } from "@/lib/store";
 
 export const dynamic = "force-dynamic";
@@ -21,6 +22,8 @@ function describe(value: string | undefined) {
 }
 
 export async function GET() {
+  // 詳細設定診斷只給已登入的學生會看；一般人只看得到正常與否
+  const admin = await isAdmin();
   const url = process.env.SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   const config = {
@@ -41,14 +44,19 @@ export async function GET() {
     SITE_URL: process.env.SITE_URL ?? null,
   };
 
+  const detail = admin ? { config } : {};
+
   if (!usingSupabase) {
-    return NextResponse.json({ ok: false, database: "未設定 SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY", config }, { status: 503 });
+    return NextResponse.json({ ok: false, database: "未設定 SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY", ...detail }, { status: 503 });
   }
   try {
     await store.listPublic();
-    return NextResponse.json({ ok: true, database: "連線正常", config });
+    return NextResponse.json({ ok: true, database: "連線正常", ...detail });
   } catch (e) {
     const err = e as { message?: string; code?: string };
-    return NextResponse.json({ ok: false, database: "連線失敗", code: err.code ?? null, message: err.message ?? String(e), config }, { status: 500 });
+    return NextResponse.json(
+      { ok: false, database: "連線失敗", ...(admin ? { code: err.code ?? null, message: err.message ?? String(e), config } : {}) },
+      { status: 500 },
+    );
   }
 }

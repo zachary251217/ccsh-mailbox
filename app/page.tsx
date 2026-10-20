@@ -1,12 +1,20 @@
 import LetterForm from "@/components/LetterForm";
+import { HeroDecor, Postmark } from "@/components/Decor";
 import { SITE_TITLE } from "@/lib/config";
 
 export default function Home() {
   return (
     <>
       <header className="hero">
-        <div className="container">
-          <span className="hero-badge">✉ 不需登入・完全匿名</span>
+        <HeroDecor />
+        <img className="hero-watermark" src="/logo-white.png" alt="" aria-hidden />
+        <div className="container hero-inner">
+          <div className="hero-brand">
+            <span className="hero-logo">
+              <img src="/logo.png" alt="中正高中校徽" />
+            </span>
+            <span className="hero-badge">✉ 不需登入・完全匿名</span>
+          </div>
           <h1>{SITE_TITLE}</h1>
           <p>對學校、活動或學生會有任何想法，都可以寫下來告訴我們。</p>
         </div>
@@ -14,6 +22,7 @@ export default function Home() {
 
       <main className="container">
         <section className="card main-card">
+          <Postmark />
           <LetterForm turnstileSiteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} />
         </section>
 
@@ -39,7 +48,10 @@ export default function Home() {
         </ul>
       </main>
 
-      <footer className="footer">中正高中學生會</footer>
+      <footer className="footer">
+        <img src="/logo.png" alt="" aria-hidden className="footer-logo" />
+        <div>中正高中學生會</div>
+      </footer>
     </>
   );
 }

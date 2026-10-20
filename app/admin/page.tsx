@@ -19,6 +19,7 @@ function LoginPage({ error }: { error?: string }) {
   return (
     <main className="container">
       <div className="card login">
+        <img className="login-logo" src="/logo.png" alt="中正高中校徽" />
         <h1>學生會後台</h1>
         <p>請使用學生會會帳登入</p>
         {error && <div className="error">此帳號沒有權限，請改用學生會會帳登入。</div>}
@@ -64,7 +65,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
       {devBypass && <div className="dev-banner">開發預覽模式：尚未設定 Google 登入，後台目前不需驗證</div>}
       <header className="admin-bar">
         <div className="container-wide">
-          <h1>{SITE_TITLE}・後台</h1>
+          <h1><img src="/logo-white.png" alt="" />{SITE_TITLE}・後台</h1>
           <div className="who">
             {session?.user?.email && <span>{session.user.email}</span>}
             {!devBypass && (

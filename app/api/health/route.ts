@@ -32,6 +32,13 @@ export async function GET() {
         : key?.startsWith("eyJ") ? "legacy JWT key"
         : "無法辨識",
     },
+    AUTH_GOOGLE_ID: { ...describe(process.env.AUTH_GOOGLE_ID), looksRight: /\.apps\.googleusercontent\.com$/.test(process.env.AUTH_GOOGLE_ID ?? "") },
+    AUTH_GOOGLE_SECRET: { ...describe(process.env.AUTH_GOOGLE_SECRET), looksRight: (process.env.AUTH_GOOGLE_SECRET ?? "").startsWith("GOCSPX-") },
+    AUTH_SECRET: { ...describe(process.env.AUTH_SECRET), looksRight: (process.env.AUTH_SECRET ?? "").length >= 32 },
+    ADMIN_EMAIL: process.env.ADMIN_EMAIL ?? null,
+    GMAIL_USER: process.env.GMAIL_USER ?? null,
+    GMAIL_APP_PASSWORD: { ...describe(process.env.GMAIL_APP_PASSWORD), looksRight: (process.env.GMAIL_APP_PASSWORD ?? "").replace(/\s/g, "").length === 16 },
+    SITE_URL: process.env.SITE_URL ?? null,
   };
 
   if (!usingSupabase) {

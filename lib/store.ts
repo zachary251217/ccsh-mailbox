@@ -48,7 +48,7 @@ function supabaseStore(sb: SupabaseClient): Store {
       const id = randomUUID();
       const attachments: Attachment[] = [];
       for (const [i, f] of files.entries()) {
-        const p = `${id}/${i}-${f.name}`;
+        const p = `${id}/${i}${path.extname(f.name)}`; // 儲存路徑只用英數，Supabase Storage 不接受中文
         const { error } = await sb.storage.from(BUCKET).upload(p, f.data, { contentType: f.type });
         if (error) throw error;
         attachments.push({ name: f.name, path: p, type: f.type, size: f.data.length });
@@ -112,7 +112,7 @@ const localStore: Store = {
     const id = randomUUID();
     const attachments: Attachment[] = [];
     for (const [i, f] of files.entries()) {
-      const p = `${id}/${i}-${f.name}`;
+      const p = `${id}/${i}${path.extname(f.name)}`; // 儲存路徑只用英數，Supabase Storage 不接受中文
       const full = path.join(DATA_DIR, "uploads", p);
       await fs.mkdir(path.dirname(full), { recursive: true });
       await fs.writeFile(full, f.data);

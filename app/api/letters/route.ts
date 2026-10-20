@@ -67,7 +67,13 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  const letter = await store.create({ category, title: title || null, content, allow_public: allowPublic, files });
+  let letter;
+  try {
+    letter = await store.create({ category, title: title || null, content, allow_public: allowPublic, files });
+  } catch (e) {
+    console.error("儲存信件失敗", e);
+    return fail("系統暫時無法儲存信件，請稍後再試。", 500);
+  }
 
   try {
     await notifyNewLetter(letter);
